@@ -1,0 +1,60 @@
+#include <WiFi.h>
+#include <FirebaseESP32.h>  // Librería para Firebase en ESP32
+
+// Configuración de Firebase
+#define FIREBASE_HOST "alarme-b2508-default-rtdb.firebaseio.com"
+#define FIREBASE_AUTH "AIzaSyApWLGhPajfT4DGa6bydNyBtayFPe5Bai8"
+
+// Configuración de WiFi
+const char* ssid = "************";
+const char* password = "***********";
+
+// Pines del sensor
+#define SENSOR_PIN 34
+
+// Objetos Firebase
+FirebaseData firebaseData;
+FirebaseConfig firebaseConfig;
+
+void setup() {
+  // Inicializar la comunicación serial
+  Serial.begin(115200);
+
+  // Conectar a WiFi
+  WiFi.begin(ssid, password);
+  Serial.print("Conectando a WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("Conectado a WiFi!");
+
+  // Configurar Firebase
+  firebaseConfig.host = FIREBASE_HOST;
+  firebaseConfig.api_key = FIREBASE_AUTH;
+  Firebase.begin(&firebaseConfig, &firebaseData);
+}
+
+void GASLevel() {
+  // Leer el valor del sensor de gas
+  int value = analogRead(SENSOR_PIN);
+  value = map(value, 0, 4095, 0, 100);
+
+  // Enviar datos a Firebase
+  if (Firebase.setInt(firebaseData, "/evento/gas_level", value)) {
+    Serial.print("Gas Level enviado a Firebase: ");
+    Serial.println(value);
+  } else {
+    Serial.println("Error al enviar el valor a Firebase");
+    Serial.println(firebaseData.errorReason());
+  }
+
+  // Imprimir el valor en el monitor serial
+  Serial.print("Gas Level: ");
+  Serial.println(value);
+}
+
+void loop() {
+  GASLevel();
+  delay(2000);  // Espera 2 segundos antes de la siguiente lectura
+}
