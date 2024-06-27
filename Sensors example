@@ -1,0 +1,55 @@
+#include <DHT.h>
+
+// Definir los pines de los sensores
+#define MQ2_PIN A0
+#define MQ135_PIN A1
+#define DHT_PIN 2
+#define DHT_TYPE DHT11
+
+// Crear objetos DHT
+DHT dht(DHT_PIN, DHT_TYPE);
+
+void setup() {
+  // Inicializar la comunicación serial
+  Serial.begin(9600);
+
+  // Inicializar el sensor DHT
+  dht.begin();
+
+  // Esperar a que el sensor DHT se estabilice
+  delay(2000);
+}
+
+void loop() {
+  // Leer el valor analógico del sensor MQ-2
+  int mq2Value = analogRead(MQ2_PIN);
+
+  // Leer el valor analógico del sensor MQ-135
+  int mq135Value = analogRead(MQ135_PIN);
+
+  // Leer la temperatura y humedad del sensor DHT11
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+
+  // Imprimir los valores leídos en el monitor serial
+  Serial.print("MQ-2 Value: ");
+  Serial.println(mq2Value);
+
+  Serial.print("MQ-135 Value: ");
+  Serial.println(mq135Value);
+
+  if (isnan(temperature) || isnan(humidity)) {
+    Serial.println("Error reading DHT11 sensor data!");
+  } else {
+    Serial.print("Temperature: ");
+    Serial.print(temperature);
+    Serial.println(" °C");
+
+    Serial.print("Humidity: ");
+    Serial.print(humidity);
+    Serial.println(" %");
+  }
+
+  // Esperar 2 segundos antes de la siguiente lectura
+  delay(2000);
+}
