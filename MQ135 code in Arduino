@@ -1,0 +1,30 @@
+#define PIN_MQ_ANALOGICO A0 // pin analógico para el sensor MQ-135 que utilizaremos para la medición
+
+const int co2_pre_alarma = 600;
+const int co2_alarma = 800;
+const int co2_evacuar = 1200;
+
+void setup() {
+  Serial.begin(9600); // inicializa comunicacion serie a 9600 bps
+}
+
+void loop() {
+  int medidaAnalogica = analogRead(PIN_MQ_ANALOGICO); // sensor MQ-135
+  double CO2ppm = medidaAnalogica * 10.57;
+
+  Serial.print("CO2: ");
+  Serial.print(CO2ppm, 0);
+  Serial.println(" ppm");
+
+  if (CO2ppm > co2_evacuar) {
+    Serial.println("PELIGRO POR CO2");
+  } else if (CO2ppm > co2_alarma) {
+    Serial.println("ALARMA CO2");
+  } else if (CO2ppm > co2_pre_alarma) {
+    Serial.println("PRE ALARMA CO2");
+  } else {
+    Serial.println("NORMAL");
+  }
+
+  delay(1000); // Espera 1 segundo antes de volver a leer el sensor
+}
