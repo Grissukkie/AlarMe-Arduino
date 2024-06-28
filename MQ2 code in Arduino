@@ -1,0 +1,30 @@
+#define PIN_MQ_ANALOGICO A0 // pin analógico para el sensor MQ-2 que utilizaremos para la medición
+
+const int gas_pre_alarma = 400;  // Ajusta estos valores según tus necesidades
+const int gas_alarma = 600;
+const int gas_evacuar = 800;
+
+void setup() {
+  Serial.begin(9600); // inicializa comunicación serie a 9600 bps
+  pinMode(PIN_MQ_ANALOGICO, INPUT); // Configura el pin analógico como entrada
+}
+
+void loop() {
+  int medidaAnalogica = analogRead(PIN_MQ_ANALOGICO); // leer el valor analógico del sensor MQ-2
+
+  // Mostrar valor analógico en el monitor serial
+  Serial.print("Valor analógico del sensor MQ-2: ");
+  Serial.println(medidaAnalogica);
+
+  if (medidaAnalogica > gas_evacuar) {
+    Serial.println("PELIGRO: Concentración de gas muy alta. EVACUAR.");
+  } else if (medidaAnalogica > gas_alarma) {
+    Serial.println("ALERTA: Concentración de gas alta. ALARMA.");
+  } else if (medidaAnalogica > gas_pre_alarma) {
+    Serial.println("PRE-ALERTA: Concentración de gas moderada.");
+  } else {
+    Serial.println("Concentración de gas baja. NORMAL.");
+  }
+
+  delay(1000); // Espera 1 segundo antes de volver a leer el sensor
+}
